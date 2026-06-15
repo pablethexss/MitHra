@@ -1,0 +1,6 @@
+@MitHra.API_HostAddress = http://localhost:5143
+
+GET {{MitHra.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

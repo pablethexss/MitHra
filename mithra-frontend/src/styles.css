@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+/* 1. CONFIGURACIÓN DE COLORES */
+:root {
+  --bg-body: #ffffff; --bg-card: #f3f4f6; --text-main: #111827; --color-accent: #ea580c; --border-color: #d1d5db;
+}
+body[data-theme="industrial"] {
+  --bg-body: #000000; --bg-card: #1b1c23; --text-main: #b7c1d8; --color-accent: #636a77; --border-color: #636a77;
+}
+body[data-theme="energia"] {
+  --bg-body: #ffffff; --bg-card: #f3f4f6; --text-main: #111827; --color-accent: #ea580c; --border-color: #d1d5db;
+}
+body[data-theme="cyberpunk"] {
+  --bg-body: #121920; --bg-card: #123948; --text-main: #1da5be; --color-accent: #20dbd8; --border-color: #12667f;
+}
+
+/* 2. MOTOR GLOBAL */
+body { background-color: var(--bg-body); color: var(--text-main); transition: 0.3s; }
+.text-main { color: var(--text-main) !important; }
+.text-accent { color: var(--color-accent) !important; }
+
+/* Componentes */
+.bg-card-tematica { background-color: var(--bg-card) !important; border: 1px solid var(--border-color) !important; }
+.btn-tematico { background-color: var(--color-accent) !important; color: #fff !important; font-weight: 700; padding: 8px 16px; border-radius: 8px; cursor: pointer; }
+.dynamic-input { background-color: var(--bg-body) !important; border: 1px solid var(--border-color) !important; color: var(--text-main) !important; }
+.badge-tematica { background-color: var(--color-accent); color: #fff; font-weight: 800; padding: 2px 8px; border-radius: 4px; font-size: 10px; }
+/* Botón Activo: usa el color del tema */
+.btn-selector-activo {
+  background-color: var(--color-accent) !important;
+  color: #000 !important; /* Texto negro para contraste */
+  font-weight: 700;
+}
+
+/* Botón Inactivo: transparente, solo resalta el texto */
+.btn-selector-inactivo {
+  background-color: transparent !important;
+  color: var(--text-main) !important;
+  opacity: 0.7;
+}
+/* Esto hace que el input sea camaleónico */
+.dynamic-input {
+  background-color: var(--bg-card) !important; /* Usa el fondo de tarjeta del tema */
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-main) !important;
+}
+
+/* Cuando haces clic (focus), el borde cambia al color de acento del tema */
+.dynamic-input:focus {
+  border-color: var(--color-accent) !important;
+  box-shadow: 0 0 0 1px var(--color-accent) !important;
+}
+/* Efecto hover que respeta el color de acento del tema */
+.hover-accent:hover {
+  color: var(--color-accent) !important;
+  background-color: var(--border-color) !important;
+}

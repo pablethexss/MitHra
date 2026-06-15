@@ -1,0 +1,10 @@
+# .NET
+bin/
+obj/
+.vs/
+.vscode/
+
+# Angular / Node
+node_modules/
+dist/
+.angular/

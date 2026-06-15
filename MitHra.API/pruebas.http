@@ -1,0 +1,19 @@
+### Variables
+@url = http://localhost:5143/api/productos
+
+### 1. PROBAR GET: Listar todos los productos (Debería devolver un arreglo vacío [] porque no hay nada)
+GET {{url}}
+
+###
+
+### 2. PROBAR POST: Insertar el primer producto al inventario de MitHra
+POST {{url}}
+Content-Type: application/json
+
+{
+  "codigo": "PROD-ALIC-001",
+  "nombre": "Alicate Universal Electricista",
+  "stock": 15,
+  "precioNeto": 10000,
+  "esAfectoIVA": true
+}
