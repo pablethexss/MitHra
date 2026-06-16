@@ -30,6 +30,10 @@ namespace MitHra.API.Controllers
         [HttpPost]
         public async Task<ActionResult<Producto>> PostProducto(Producto producto)
         {
+            bool existe = await _context.Productos.AnyAsync(p => p.Codigo == producto.Codigo);
+            if (existe) {
+                return Conflict("El código de producto ya está registrado.");
+            }
             // Agregamos el producto al set de Entity Framework
             _context.Productos.Add(producto);
             
@@ -90,6 +94,42 @@ namespace MitHra.API.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent(); // 204: Todo salió bien y no hay nada que devolver
+        }
+        [HttpPost("bulk")]
+        public async Task<IActionResult> BulkImport([FromBody] List<Producto> productos)
+        {
+            if (productos == null || !productos.Any()) return BadRequest("Lista vacía");
+
+            foreach (var p in productos)
+            {
+                // 1. Buscamos por el 'Codigo' que es tu identificador de negocio
+                var existente = await _context.Productos
+                    .FirstOrDefaultAsync(x => x.Codigo == p.Codigo);
+
+                if (existente != null)
+                {
+                    // 2. Si existe, actualizamos los valores. 
+                    // NOTA: No tocamos el 'Id' porque es la llave primaria de la base de datos
+                    existente.CodigoBarras = p.CodigoBarras;
+                    existente.Nombre = p.Nombre;
+                    existente.Tipo = p.Tipo;
+                    existente.Stock += p.Stock; // Sumamos lo que llega del camión
+                    existente.StockMinimo = p.StockMinimo;
+                    existente.PrecioNeto = p.PrecioNeto;
+                    existente.EsAfectoIVA = p.EsAfectoIVA;
+                    existente.RequiereMayorEdad = p.RequiereMayorEdad;
+                    existente.FechaCaducidad = p.FechaCaducidad;
+                }
+                else
+                {
+                    // 3. Si es nuevo, simplemente lo añadimos. 
+                    // EF se encarga de ignorar el 'Id' (que está marcado como DatabaseGeneratedOption.Identity)
+                    _context.Productos.Add(p);
+                }
+            }
+
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "Carga procesada con éxito" });
         }
     }    
 }

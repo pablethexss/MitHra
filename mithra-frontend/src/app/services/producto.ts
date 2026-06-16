@@ -5,6 +5,7 @@ import { firstValueFrom } from 'rxjs';
 export interface Producto {
   id?: number;
   codigo: string;
+  codigoBarras: string;
   nombre: string;
   tipo: string;
   stock: number;
@@ -77,5 +78,9 @@ export class ProductosService {
       // Si no tiene ID, es nuevo -> POST
       await this.crearProducto(producto);
     }
+  }
+  async cargarMasiva(productos: Producto[]) {
+    // Asegúrate de que el endpoint en .NET sea /api/productos/bulk
+    return await firstValueFrom(this.http.post<void>(`${this.apiUrl}/bulk`, productos));
   }
 }

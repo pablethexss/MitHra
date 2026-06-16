@@ -58,6 +58,10 @@
                 [class]="filtroActual() === 'Perecible' ? 'px-3 py-1.5 text-xs rounded-lg btn-selector-activo' : 'px-3 py-1.5 text-xs rounded-lg btn-selector-inactivo'">
           📅 Perecibles
         </button>
+        <button (click)="aplicarFiltro('Reponer')" 
+                [class]="filtroActual() === 'Reponer' ? 'px-3 py-1.5 text-xs rounded-lg btn-selector-activo' : 'px-3 py-1.5 text-xs rounded-lg btn-selector-inactivo'">
+          🚨 Reponer
+        </button>
       </div>
     </div>
 
@@ -73,7 +77,7 @@
         </thead>
         <tbody class="divide-y divide-gray-700/30 text-sm">
           
-          @for (producto of productosFiltrados(); track producto.codigo) {
+          @for (producto of productosPaginados(); track producto.codigo) {
             <tr class="hover:bg-mithra-card/50 transition-colors animate-in fade-in duration-150">
               <td class="p-4 font-mono text-mithra-acento font-bold break-all pr-2">
                 {{ producto.codigo }}
@@ -124,9 +128,23 @@
               </td>
             </tr>
           }
-
         </tbody>
       </table>
+      <div class="flex justify-center items-center gap-4 mt-6">
+        <button [disabled]="currentPage() === 1" 
+                (click)="cambiarPagina(currentPage() - 1)"
+                class="px-4 py-2 btn-tematico bg-mithra-card rounded hover:bg-opacity-80">
+          Anterior
+        </button>
+                
+        <span class="font-bold">Pág {{ currentPage() }} de {{ totalPaginas() }}</span>
+        
+        <button [disabled]="currentPage() === totalPaginas()" 
+                (click)="cambiarPagina(currentPage() + 1)"
+                class="px-4 py-2 btn-tematico bg-mithra-card rounded hover:bg-opacity-80">
+          Siguiente
+        </button>
+      </div>
     </div>
 
     <app-productos></app-productos>

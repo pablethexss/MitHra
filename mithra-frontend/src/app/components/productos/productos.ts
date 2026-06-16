@@ -2,6 +2,7 @@ import { Component, OnInit, inject, signal, computed, effect } from '@angular/co
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ProductosService, Producto } from '../../services/producto';
+import * as XLSX from 'xlsx';
 
 @Component({
   selector: 'app-productos',
@@ -33,6 +34,7 @@ export class ProductosComponent implements OnInit {
       } else {
         // Reseteamos al estado inicial si no hay producto (ej: crear nuevo)
         this.productoForm.reset({ 
+          codigoBarras: '',
           tipo: 'Fisico', 
           stock: 0, 
           stockMinimo: 0, 
@@ -58,6 +60,7 @@ export class ProductosComponent implements OnInit {
     this.productoForm = this.fb.group({
       id: [null], // <--- ESTO ES LO QUE FALTA
       codigo: ['', [Validators.required, Validators.minLength(3)]],
+      codigoBarras: [''],
       nombre: ['', Validators.required],
       tipo: ['Fisico', Validators.required],
       stock: [0, [Validators.required, Validators.min(0)]],
@@ -102,23 +105,58 @@ export class ProductosComponent implements OnInit {
       ...this.productoForm.value, 
       id: this.productosService.productoAEditar()?.id 
     };
-    console.log("¿Qué estamos enviando?", productoAEnviar);
-    console.log("¿Tiene ID el producto?", productoAEnviar.id);
     try {
       await this.productosService.guardarProducto(productoAEnviar);
       alert('¡Producto guardado exitosamente!');
       this.productosService.cerrarModal();
-    } catch (err) {
-      console.error('Error al guardar:', err);
-      alert('Hubo un problema al conectar con el servidor.');
+      // Opcional: Refrescar la lista inmediatamente para ver el cambio
+      this.productosService.cargarProductos();
+    } catch (err: any) {
+      if (err.status === 409) { // 409 Conflict
+        alert('Error: Este código ya existe. Por favor usa uno diferente.');
+      } else {
+        alert('Hubo un problema al conectar con el servidor.');
+      }
     }
   }
   public async eliminarProducto(id: number): Promise<void> {
-        if (confirm('¿Estás seguro de que deseas eliminar este producto?')) {
-            await this.productosService.eliminarProducto(id);
-            this.productosService.listaProductos.update(lista => 
-                lista.filter(p => p.id !== id)
-            );
-        }
+    if (confirm('¿Estás seguro de que deseas eliminar este producto?')) {
+        await this.productosService.eliminarProducto(id);
+        this.productosService.listaProductos.update(lista => 
+        lista.filter(p => p.id !== id)
+      );
     }
+  }
+  async onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+    const data = new Uint8Array(e.target.result);
+    const workbook = XLSX.read(data, { type: 'array' });
+    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+    
+    // Convertimos a JSON. 'header: 1' ayuda si quieres controlar los nombres de columnas
+    const jsonData: any[] = XLSX.utils.sheet_to_json(worksheet);
+    
+    // Aquí jsonData contiene los objetos listos para guardar.
+    // Debes validarlos antes de enviarlos.
+    console.log("Datos cargados:", jsonData);
+    this.enviarCargaMasiva(jsonData);
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+async enviarCargaMasiva(productos: Producto[]) {
+  try {
+    // Necesitaremos crear este método en tu ProductosService
+      await this.productosService.cargarMasiva(productos);
+      alert('¡Carga masiva exitosa!');
+      this.productosService.cargarProductos(); // Refrescar la lista
+    } catch (error) {
+      console.error(error);
+      alert('Error al procesar el archivo.');
+    }
+  }
 }
