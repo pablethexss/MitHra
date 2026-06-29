@@ -1,5 +1,6 @@
 ### Variables
 @url = http://localhost:5143/api/productos
+@baseUrl = http://localhost:5143
 
 ### 1. PROBAR GET: Listar todos los productos (Debería devolver un arreglo vacío [] porque no hay nada)
 GET {{url}}
@@ -16,4 +17,27 @@ Content-Type: application/json
   "stock": 15,
   "precioNeto": 10000,
   "esAfectoIVA": true
+}
+
+### Crear nuevo producto con Tenant
+POST {{url}}
+Content-Type: application/json
+X-Tenant-Id: A0000000-0000-0000-0000-000000000001
+
+{
+    "codigo": "PROD-001",
+    "nombre": "Laptop de Prueba",
+    "precioNeto": 500000
+}
+
+### 1. Probar el login centralizado (Vediovis vía MitHra)
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+X-Tenant-Id: A0000000-0000-0000-0000-000000000001
+
+{
+    "email": "admin@elvalle.com",
+    "password": "Password123!",
+    "audience": "mitra-api",
+    "tenantIdentifier": "A0000000-0000-0000-0000-000000000001"
 }

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using MitHra.API.Data;
 using MitHra.API.Models;
 
+
 namespace MitHra.API.Controllers
 {
     // Esto le dice a .NET que este archivo responderá en la ruta: http://localhost:XXXX/api/productos
